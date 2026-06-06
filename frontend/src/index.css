@@ -1,0 +1,314 @@
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #f4f4f4;
+  color: #333;
+}
+
+
+.navbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: #ffffff;
+  border-bottom: 1px solid #ccc;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.login-btn {
+  padding: 6px 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+
+.hero {
+  display: flex;
+  padding: 40px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.hero-left h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero-left p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.hero-buttons button {
+  padding: 8px 16px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.hero-center img {
+  max-width: 300px;
+}
+
+
+.components {
+  padding: 40px;
+  background: #fff;
+}
+
+.components-track {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+}
+
+.component-card {
+  width: 150px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.component-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+
+.products-page { 
+  padding: 40px; 
+}
+
+.products-layout { 
+  display: flex;
+  gap: 30px; 
+}
+
+.products-sidebar { 
+  width: 200px;
+  background: #fff; 
+  padding: 15px; 
+  border: 1px solid #ccc; 
+}
+
+.products-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  gap: 20px; 
+  flex: 1;
+}
+
+.product-card { 
+  background: #fff; 
+  border: 1px solid #ccc; 
+  padding: 15px; 
+  text-align: center;
+}
+
+.product-image img { 
+  width: 100%; 
+  height: 120px; 
+  object-fit: contain; 
+}
+
+.product-price { 
+  font-weight: bold; 
+  margin: 10px 0; 
+}
+
+.buy-now-btn { 
+  display: block;
+  background: #000; 
+  color: #fff; 
+  text-decoration: none; 
+  padding: 5px; 
+  margin-top: 10px;
+}
+
+
+.product-details-container { 
+  padding: 40px; 
+}
+
+.product-details-wrapper { 
+  display: flex;
+  gap: 30px; 
+  background: #fff; 
+  padding: 20px; 
+  border: 1px solid #ccc;
+}
+
+.main-image-container img { 
+  max-width: 300px; 
+}
+
+.new-price { 
+  font-size: 20px; 
+  font-weight: bold; 
+}
+
+.btn-buy-now, .btn-add-cart { 
+  background: #000; 
+  color: #fff; 
+  border: none; 
+  padding: 10px 15px; 
+  cursor: pointer; 
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+
+.cart-container { 
+  display: flex; 
+  gap: 30px; 
+  padding: 40px; 
+}
+
+.cart-items { 
+  flex: 2; 
+}
+
+.cart-summary { 
+  flex: 1; 
+  background: #fff; 
+  padding: 20px; 
+  border: 1px solid #ccc; 
+}
+
+.cart-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  padding: 15px 0; 
+  border-bottom: 1px solid #eee; 
+}
+
+.cart-item img { 
+  width: 80px; 
+  height: 80px; 
+  object-fit: cover; 
+}
+
+.checkout-btn { 
+  display: block; 
+  background: #000; 
+  color: #fff; 
+  padding: 10px; 
+  text-align: center;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+
+.builder-container { 
+  display: flex; 
+  gap: 30px; 
+  padding: 40px; 
+}
+
+.builder-parts {
+  flex: 2;
+}
+
+.component-select { 
+  width: 100%; 
+  padding: 8px; 
+  border: 1px solid #ccc; 
+  margin-bottom: 10px; 
+}
+
+.builder-summary { 
+  flex: 1;
+  border: 1px solid #ccc; 
+  padding: 20px; 
+  background: #fff; 
+}
+
+
+.trending-wrapper {
+  background: #222;
+  color: #fff;
+  padding: 40px;
+}
+
+.galaxy-hero { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+.price { 
+  font-size: 32px; 
+  font-weight: bold; 
+}
+
+
+.auth-input, .form-row input, #subject, #message {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.send-btn { 
+  background: #000; 
+  color: #fff; 
+  padding: 10px; 
+  border: none; 
+  cursor: pointer; 
+}
+
+
+.footer {
+  background: #eee;
+  padding: 30px;
+  border-top: 1px solid #ccc;
+  margin-top: 40px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer-links a {
+  display: block;
+  color: #555;
+  text-decoration: none;
+  margin-bottom: 5px;
+}
+
