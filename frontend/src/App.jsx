@@ -5,6 +5,8 @@ import Footer from './Footer';
 import Home from './Home';
 import ProductList from './ProductList';
 import ProductDetails from './ProductDetails';
+import Login from './Login';
+import Register from './Register';
 
 function App() {
   return (
@@ -16,6 +18,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/product/:slug" element={<ProductDetails />} />
+          
+          {/* Week 3: Authentication Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </main>
 
