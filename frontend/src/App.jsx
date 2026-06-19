@@ -7,6 +7,7 @@ import ProductList from './ProductList';
 import ProductDetails from './ProductDetails';
 import Login from './Login';
 import Register from './Register';
+import Cart from './Cart'; 
 
 function App() {
   return (
@@ -19,9 +20,10 @@ function App() {
           <Route path="/products" element={<ProductList />} />
           <Route path="/product/:slug" element={<ProductDetails />} />
           
-          {/* Week 3: Authentication Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
+          <Route path="/cart" element={<Cart />} /> 
         </Routes>
       </main>
 
