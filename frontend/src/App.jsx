@@ -10,6 +10,7 @@ import Register from './Register';
 import Cart from './Cart'; 
 import Checkout from './Checkout';
 import MyOrders from './MyOrders';
+import BuildPC from './BuildPC';
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
           
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/my-orders" element={<MyOrders />} />
+
+          <Route path="/build-pc" element={<BuildPC />} />
         </Routes>
       </main>
 
