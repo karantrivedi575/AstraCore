@@ -1,19 +1,30 @@
-
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+:root {
+  --primary: #6b4eff;
+  --primary-hover: #5a3ee0;
+  --secondary: #1a1a2e;
+  --bg-light: #f4f7fa;
+  --bg-white: #ffffff;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --border-color: #eaeaea;
+  --radius-sm: 8px;
+  --font-main: 'Inter', sans-serif;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-main);
 }
 
 body {
-  background: #f4f4f4;
-  color: #333;
+  background: var(--bg-light);
+  color: var(--text-main);
 }
-
 
 .navbar {
   height: 60px;
@@ -21,8 +32,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 30px;
-  background: #ffffff;
-  border-bottom: 1px solid #ccc;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .nav-links {
@@ -32,12 +43,12 @@ body {
 
 .nav-links a {
   text-decoration: none;
-  color: #555;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .nav-links a:hover {
-  color: #000;
+  color: var(--primary);
   text-decoration: underline;
 }
 
@@ -47,20 +58,28 @@ body {
   gap: 15px;
 }
 
-.login-btn {
-  padding: 6px 12px;
-  background: #000;
-  color: #fff;
+.login-btn, .btn-buy-now, .btn-add-cart, .checkout-btn, .send-btn {
+  padding: 10px 16px;
+  background: var(--primary);
+  color: var(--bg-white);
   border: none;
+  border-radius: var(--radius-sm); 
   cursor: pointer;
+  transition: background 0.3s ease; 
+  text-decoration: none;
+  text-align: center;
+}
+
+.login-btn:hover, .btn-buy-now:hover, .btn-add-cart:hover, .checkout-btn:hover, .send-btn:hover {
+  background: var(--primary-hover);
 }
 
 
 .hero {
   display: flex;
   padding: 40px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .hero-left h1 {
@@ -69,13 +88,17 @@ body {
 }
 
 .hero-left p {
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 20px;
 }
 
 .hero-buttons button {
-  padding: 8px 16px;
+  padding: 10px 16px;
   margin-right: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
@@ -83,10 +106,9 @@ body {
   max-width: 300px;
 }
 
-
 .components {
   padding: 40px;
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .components-track {
@@ -97,9 +119,10 @@ body {
 
 .component-card {
   width: 150px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   padding: 10px;
   text-align: center;
+  border-radius: var(--radius-sm);
 }
 
 .component-card img {
@@ -107,7 +130,6 @@ body {
   height: 100px;
   object-fit: contain;
 }
-
 
 .products-page { 
   padding: 40px; 
@@ -120,9 +142,10 @@ body {
 
 .products-sidebar { 
   width: 200px;
-  background: #fff; 
+  background: var(--bg-white); 
   padding: 15px; 
-  border: 1px solid #ccc; 
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm); 
 }
 
 .products-grid { 
@@ -133,10 +156,11 @@ body {
 }
 
 .product-card { 
-  background: #fff; 
-  border: 1px solid #ccc; 
+  background: var(--bg-white); 
+  border: 1px solid var(--border-color); 
   padding: 15px; 
   text-align: center;
+  border-radius: var(--radius-sm);
 }
 
 .product-image img { 
@@ -150,16 +174,6 @@ body {
   margin: 10px 0; 
 }
 
-.buy-now-btn { 
-  display: block;
-  background: #000; 
-  color: #fff; 
-  text-decoration: none; 
-  padding: 5px; 
-  margin-top: 10px;
-}
-
-
 .product-details-container { 
   padding: 40px; 
 }
@@ -167,9 +181,10 @@ body {
 .product-details-wrapper { 
   display: flex;
   gap: 30px; 
-  background: #fff; 
+  background: var(--bg-white); 
   padding: 20px; 
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
 }
 
 .main-image-container img { 
@@ -180,17 +195,6 @@ body {
   font-size: 20px; 
   font-weight: bold; 
 }
-
-.btn-buy-now, .btn-add-cart { 
-  background: #000; 
-  color: #fff; 
-  border: none; 
-  padding: 10px 15px; 
-  cursor: pointer; 
-  margin-top: 10px;
-  margin-right: 10px;
-}
-
 
 .cart-container { 
   display: flex; 
@@ -204,9 +208,10 @@ body {
 
 .cart-summary { 
   flex: 1; 
-  background: #fff; 
+  background: var(--bg-white); 
   padding: 20px; 
-  border: 1px solid #ccc; 
+  border: 1px solid var(--border-color); 
+  border-radius: var(--radius-sm);
 }
 
 .cart-item { 
@@ -214,7 +219,7 @@ body {
   align-items: center; 
   gap: 15px; 
   padding: 15px 0; 
-  border-bottom: 1px solid #eee; 
+  border-bottom: 1px solid var(--border-color); 
 }
 
 .cart-item img { 
@@ -222,17 +227,6 @@ body {
   height: 80px; 
   object-fit: cover; 
 }
-
-.checkout-btn { 
-  display: block; 
-  background: #000; 
-  color: #fff; 
-  padding: 10px; 
-  text-align: center;
-  text-decoration: none;
-  margin-top: 15px;
-}
-
 
 .builder-container { 
   display: flex; 
@@ -246,22 +240,23 @@ body {
 
 .component-select { 
   width: 100%; 
-  padding: 8px; 
-  border: 1px solid #ccc; 
+  padding: 10px; 
+  border: 1px solid var(--border-color); 
+  border-radius: var(--radius-sm);
   margin-bottom: 10px; 
 }
 
 .builder-summary { 
   flex: 1;
-  border: 1px solid #ccc; 
+  border: 1px solid var(--border-color); 
   padding: 20px; 
-  background: #fff; 
+  background: var(--bg-white);
+  border-radius: var(--radius-sm); 
 }
 
-
 .trending-wrapper {
-  background: #222;
-  color: #fff;
+  background: var(--secondary);
+  color: var(--bg-white);
   padding: 40px;
 }
 
@@ -276,27 +271,17 @@ body {
   font-weight: bold; 
 }
 
-
 .auth-input, .form-row input, #subject, #message {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   margin-bottom: 10px;
 }
 
-.send-btn { 
-  background: #000; 
-  color: #fff; 
-  padding: 10px; 
-  border: none; 
-  cursor: pointer; 
-}
-
-
 .footer {
-  background: #eee;
+  background: var(--border-color);
   padding: 30px;
-  border-top: 1px solid #ccc;
   margin-top: 40px;
 }
 
@@ -307,8 +292,7 @@ body {
 
 .footer-links a {
   display: block;
-  color: #555;
+  color: var(--text-muted);
   text-decoration: none;
   margin-bottom: 5px;
 }
-
