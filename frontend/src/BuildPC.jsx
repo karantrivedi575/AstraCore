@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function BuildPC() {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
   const [hardwareData, setHardwareData] = useState({ CPU: [], GPU: [], RAM: [], Motherboard: [] });
   const [loading, setLoading] = useState(true);
@@ -14,6 +14,7 @@ function BuildPC() {
   const [compatMessage, setCompatMessage] = useState("");
 
   useEffect(() => {
+    // Fetch all products for the builder without pagination limits
     axios.get('http://localhost:8080/api/products?page=0&size=1000')
       .then(res => {
         const products = res.data.products.map(p => ({
@@ -22,11 +23,12 @@ function BuildPC() {
           price: p.price,
           img: p.image || '/pc-computer.png',
           socket: p.socket,
-          spec: p.specs, 
+          spec: p.specs,
           categorySlug: p.category ? p.category.slug : '',
-          wattage: p.wattage || 0 
+          wattage: p.wattage || 0
         }));
 
+        // Sort into categories
         setHardwareData({
           CPU: products.filter(p => p.categorySlug === 'processors'),
           GPU: products.filter(p => p.categorySlug === 'graphic-cards'),
@@ -64,9 +66,8 @@ function BuildPC() {
 
       setBuild(sharedBuild);
       setCpuSocket(socket);
-      setCompatMessage("Build loaded from shared link.");
-    } 
-    else {
+      setCompatMessage("Build loaded from shared link!");
+    } else {
       const savedBuild = JSON.parse(localStorage.getItem("pc_build"));
       if (savedBuild) {
         setBuild(savedBuild.parts || { CPU: null, GPU: null, RAM: null, Motherboard: null });
@@ -86,13 +87,14 @@ function BuildPC() {
     const item = hardwareData[type].find(c => c.id === selectedId);
     let newBuild = { ...build, [type]: item };
 
+    // CPU Socket validation
     if (type === 'CPU') {
       setCpuSocket(item.socket);
-      setCompatMessage("Motherboard list updated for socket compatibility.");
+      setCompatMessage("Compatible motherboards loaded.");
       
       if (build.Motherboard && build.Motherboard.socket !== item.socket) {
         newBuild.Motherboard = null;
-        setCompatMessage("Motherboard removed due to CPU socket incompatibility.");
+        setCompatMessage("Motherboard removed due to incompatibility with new CPU.");
       }
     }
 
@@ -111,7 +113,7 @@ function BuildPC() {
   const handleShareBuild = () => {
     const activeParts = Object.values(build).filter(p => p !== null);
     if (activeParts.length === 0) {
-      alert("Please select components to share.");
+      alert("Please select some components before sharing!");
       return;
     }
 
@@ -122,7 +124,10 @@ function BuildPC() {
     if (build.Motherboard) params.append('mobo', build.Motherboard.id);
     
     const shareUrl = `${window.location.origin}/build-pc?${params.toString()}`;
-    navigator.clipboard.writeText(shareUrl).then(() => alert("Build link copied to clipboard!"));
+    
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => alert("🔗 Build link copied to clipboard! Share it with your friends."))
+      .catch(() => alert("Failed to copy link."));
   };
 
   const handleAddToCart = () => {
@@ -132,38 +137,49 @@ function BuildPC() {
       return;
     }
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    
-    activeParts.forEach(part => {
-      const existingItem = cart.find(item => item.id === part.id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({
-          id: part.id,
-          name: part.name,
-          price: part.price,
-          image: part.img,
-          quantity: 1,
-          slug: part.categorySlug
-        });
-      }
-    });
+    // Auth validation
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.token) {
+      alert("Please log in or register to add your custom build to the cart!");
+      navigate('/login');
+      return; 
+    }
 
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const buildTotal = activeParts.reduce((sum, p) => sum + p.price, 0);
+    
+    const customBuildItem = {
+      id: `custom-build-${Date.now()}`,
+      name: "AstraCore Custom PC",
+      price: buildTotal,
+      image: "/PC_Case.png", 
+      quantity: 1,
+      slug: "custom-pc",
+      isBuild: true,
+      parts: build 
+    };
+
+    cart.push(customBuildItem);
     localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Clear builder state after cart transfer
     setBuild({ CPU: null, GPU: null, RAM: null, Motherboard: null });
     setCpuSocket(null);
     localStorage.removeItem('pc_build');
 
     window.dispatchEvent(new Event('cartUpdated'));
+    alert("Custom PC Build added to cart!");
     navigate('/cart');
   };
 
   const activeParts = Object.entries(build).filter(([key, value]) => value !== null);
   const totalPrice = activeParts.reduce((sum, [key, part]) => sum + part.price, 0);
-  const totalWattage = activeParts.reduce((sum, [key, part]) => sum + (part.wattage || 0), 0);
 
+  const totalWattage = activeParts.reduce((sum, [key, part]) => sum + (part.wattage || 0), 0);
+  const maxDisplayWattage = 850;
+  const wattagePercentage = Math.min((totalWattage / maxDisplayWattage) * 100, 100);
+
+  // FPS Estimator 
   let fpsEstimates = null;
   if (build.CPU && build.GPU) {
     let baseFps = 60; 
@@ -177,7 +193,7 @@ function BuildPC() {
 
     fpsEstimates = {
       cyberpunk: Math.round(baseFps * 0.85),  
-      gta: Math.round(baseFps * 1.6),        
+      gta: Math.round(baseFps * 1.6),         
       valorant: Math.round(baseFps * 4.2)     
     };
   }
@@ -185,115 +201,173 @@ function BuildPC() {
   const availableMotherboards = hardwareData.Motherboard.filter(m => !cpuSocket || m.socket === cpuSocket);
 
   if (loading) {
-    return <div style={{ padding: '100px', textAlign: 'center' }}><h2>Loading Architecture...</h2></div>;
+    return <div style={{ padding: '100px', textAlign: 'center', fontSize: '20px' }}>Loading Builder Database...</div>;
   }
 
   return (
-    <section style={{ padding: '40px 20px', background: '#f4f4f4', minHeight: '80vh' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '40px' }}>System Configurator</h1>
+    <>
+      <section className="builder-hero">
+        <h1>Build Your Dream PC</h1>
+        <p>Choose the components and assemble your perfect system.</p>
+      </section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
-          
-          {/* LEFT: Component Selection */}
-          <div style={{ background: '#fff', padding: '30px', border: '1px solid #ccc' }}>
-            <h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>Select Components</h2>
+      <section className="builder-container">
+        
+        {/* LEFT: Component Selection */}
+        <div className="builder-parts" style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '30px', boxShadow: '0 10px 40px rgba(0, 0, 0, 0.06)', border: '1px solid #f0f0f0' }}>
+          <h2>Select Components</h2>
 
-            {['CPU', 'GPU', 'RAM', 'Motherboard'].map((type) => {
-              const options = type === 'Motherboard' ? availableMotherboards : hardwareData[type];
+          {['CPU', 'GPU', 'RAM', 'Motherboard'].map((type) => {
+            
+            let icon = "fa-microchip";
+            if(type === 'GPU') icon = "fa-tv";
+            if(type === 'RAM') icon = "fa-memory";
+            if(type === 'Motherboard') icon = "fa-server";
 
-              return (
-                <div key={type} style={{ marginBottom: '30px' }}>
-                  <h3 style={{ marginBottom: '10px' }}>{type}</h3>
-                  <select 
-                    onChange={(e) => handleSelectComponent(type, e)} 
-                    defaultValue=""
-                    style={{ width: '100%', padding: '10px', marginBottom: '10px', border: '1px solid #ccc' }}
-                  >
-                    <option value="">Select {type}</option>
-                    {options.map(item => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} - ₹{item.price.toLocaleString('en-IN')}
-                      </option>
-                    ))}
-                  </select>
+            const options = type === 'Motherboard' ? availableMotherboards : hardwareData[type];
 
-                  {type === 'Motherboard' && compatMessage && (
-                    <p style={{ fontSize: '12px', color: '#555', fontStyle: 'italic' }}>{compatMessage}</p>
-                  )}
+            return (
+              <div className="part-group" key={type}>
+                <div className="part-header">
+                  <i className={`fa-solid ${icon}`}></i>
+                  <h3>{type === 'RAM' ? 'Memory (RAM)' : type === 'CPU' ? 'Processor' : type === 'GPU' ? 'Graphics Card' : type}</h3>
+                </div>
 
-                  {build[type] && (
-                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center', background: '#f9f9f9', padding: '15px', border: '1px solid #eee', marginTop: '10px' }}>
-                      <div style={{ width: '80px', height: '80px', background: '#fff', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <img src={build[type].img} alt={build[type].name} style={{ maxWidth: '90%', maxHeight: '90%' }} onError={(e) => e.target.src = '/pc-computer.png'} />
+                <select className="component-select" onChange={(e) => handleSelectComponent(type, e)} defaultValue="">
+                  <option value="">Select {type}</option>
+                  {options.map(item => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} - ₹{item.price.toLocaleString('en-IN')}
+                    </option>
+                  ))}
+                </select>
+
+                {type === 'Motherboard' && compatMessage && (
+                  <p className="compatibility-message">{compatMessage}</p>
+                )}
+
+                {build[type] && (
+                  <div className="component-preview">
+                    <div className="preview-card">
+                      <div className="preview-img">
+                        <img src={build[type].img} alt={build[type].name} onError={(e) => e.target.src = '/pc-computer.png'} />
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ margin: '0 0 5px 0' }}>{build[type].name}</h4>
-                        <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#666' }}>{build[type].spec}</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                          <span style={{ fontWeight: 'bold' }}>₹{build[type].price.toLocaleString('en-IN')}</span>
-                          <button onClick={() => removeComponent(type)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', textDecoration: 'underline' }}>Remove</button>
+                      <div className="preview-info">
+                        <h4>{build[type].name}</h4>
+                        <p>{build[type].spec}</p>
+                        <div className="preview-bottom">
+                          <span style={{ fontWeight: 700, fontSize: '18px', color: '#222' }}>₹{build[type].price.toLocaleString('en-IN')}</span>
+                          <button onClick={() => removeComponent(type)} className="remove-btn">
+                            <i className="fa-solid fa-xmark"></i>
+                          </button>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* RIGHT: Summary */}
-          <div style={{ background: '#fff', padding: '30px', border: '1px solid #ccc', height: 'fit-content' }}>
-            <h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>System Status</h2>
-
-            <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ccc', background: '#fafafa' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                <strong>Est. Wattage</strong>
-                <span style={{ color: totalWattage > 600 ? '#d63031' : '#000' }}>{totalWattage}W</span>
+                  </div>
+                )}
               </div>
-              <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
-                {totalWattage > 0 ? `Recommended PSU: ${Math.ceil((totalWattage * 1.5) / 50) * 50}W` : 'Select parts to calculate power.'}
-              </p>
-            </div>
+            );
+          })}
+        </div>
 
-            <div style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ccc', background: '#fafafa' }}>
-              <strong style={{ display: 'block', marginBottom: '10px' }}>Est. Gaming Performance (1080p)</strong>
-              {!fpsEstimates ? (
-                <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Select CPU and GPU for estimates.</p>
-              ) : (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <span style={{ display: 'block', fontSize: '10px', color: '#666' }}>Cyberpunk</span>
-                    <strong>{fpsEstimates.cyberpunk} FPS</strong>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <span style={{ display: 'block', fontSize: '10px', color: '#666' }}>GTA V</span>
-                    <strong>{fpsEstimates.gta} FPS</strong>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <span style={{ display: 'block', fontSize: '10px', color: '#666' }}>Valorant</span>
-                    <strong>{fpsEstimates.valorant} FPS</strong>
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* RIGHT: Summary */}
+        <div className="builder-summary" style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '30px', boxShadow: '0 10px 40px rgba(0, 0, 0, 0.06)', border: '1px solid #f0f0f0' }}>
+          <h2>Your Build</h2>
 
-            <div style={{ borderTop: '2px solid #000', paddingTop: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', fontSize: '20px' }}>
-              <strong>Total</strong>
-              <strong>₹{totalPrice.toLocaleString('en-IN')}</strong>
+          {/* Wattage Tracker */}
+          <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '10px', marginBottom: '15px', border: '1px solid #e9ecef' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontWeight: 600, fontSize: '14px', color: '#555' }}>
+                <i className="fa-solid fa-bolt" style={{ color: '#ffd43b', marginRight: '5px' }}></i>
+                Estimated Wattage
+              </span>
+              <span style={{ fontWeight: 800, color: totalWattage > 600 ? '#e74c3c' : '#2ecc71' }}>
+                {totalWattage}W
+              </span>
             </div>
-
-            <button onClick={handleShareBuild} style={{ width: '100%', padding: '12px', background: '#fff', border: '1px solid #000', color: '#000', fontWeight: 'bold', cursor: 'pointer', marginBottom: '10px' }}>
-              Copy Share Link
-            </button>
-            <button onClick={handleAddToCart} style={{ width: '100%', padding: '12px', background: '#000', border: '1px solid #000', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>
-              Add Parts to Cart
-            </button>
+            
+            <div style={{ width: '100%', height: '8px', background: '#e0e0e0', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ 
+                height: '100%', 
+                width: `${wattagePercentage}%`, 
+                background: totalWattage > 600 ? '#e74c3c' : '#2ecc71',
+                transition: 'width 0.4s ease-in-out, background 0.4s ease-in-out' 
+              }}></div>
+            </div>
+            
+            <p style={{ fontSize: '11px', color: '#888', marginTop: '8px', textAlign: 'center' }}>
+              {totalWattage > 0 
+                ? "We recommend a PSU with at least " + Math.ceil((totalWattage * 1.5) / 50) * 50 + "W for this build." 
+                : "Select components to calculate power draw."}
+            </p>
           </div>
 
+          {/* FPS Estimator */}
+          <div style={{ background: '#fff', padding: '15px', borderRadius: '10px', marginBottom: '20px', border: '1px solid #e9ecef', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            <span style={{ fontWeight: 800, fontSize: '13px', color: '#6b4eff', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '15px', textAlign: 'center' }}>
+              <i className="fa-solid fa-gamepad" style={{ marginRight: '5px' }}></i>
+              Gaming Performance (1080p)
+            </span>
+            
+            {!fpsEstimates ? (
+              <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', margin: '10px 0' }}>
+                Select a CPU and Graphics Card to view estimated FPS.
+              </p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                <div style={{ textAlign: 'center', background: '#fcfcfc', padding: '10px 5px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+                  <i className="fa-solid fa-city" style={{ color: '#f39c12', fontSize: '18px', marginBottom: '8px' }}></i>
+                  <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Cyberpunk</span>
+                  <span style={{ display: 'block', fontSize: '16px', fontWeight: 800, color: '#333' }}>{fpsEstimates.cyberpunk} <small style={{ fontSize: '10px', color: '#aaa' }}>FPS</small></span>
+                </div>
+                <div style={{ textAlign: 'center', background: '#fcfcfc', padding: '10px 5px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+                  <i className="fa-solid fa-car-side" style={{ color: '#3498db', fontSize: '18px', marginBottom: '8px' }}></i>
+                  <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>GTA V</span>
+                  <span style={{ display: 'block', fontSize: '16px', fontWeight: 800, color: '#333' }}>{fpsEstimates.gta} <small style={{ fontSize: '10px', color: '#aaa' }}>FPS</small></span>
+                </div>
+                <div style={{ textAlign: 'center', background: '#fcfcfc', padding: '10px 5px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+                  <i className="fa-solid fa-crosshairs" style={{ color: '#e74c3c', fontSize: '18px', marginBottom: '8px' }}></i>
+                  <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Valorant</span>
+                  <span style={{ display: 'block', fontSize: '16px', fontWeight: 800, color: '#333' }}>{fpsEstimates.valorant} <small style={{ fontSize: '10px', color: '#aaa' }}>FPS</small></span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <ul id="buildList">
+            {activeParts.length === 0 ? (
+              <li>No components selected</li>
+            ) : (
+              activeParts.map(([type, part]) => (
+                <li key={type}>
+                  <strong style={{ width: '80px' }}>{type}</strong>
+                  <span style={{ flex: 1, textAlign: 'left', marginLeft: '10px' }}>{part.name}</span>
+                  <span style={{ fontWeight: 600 }}>₹{part.price.toLocaleString('en-IN')}</span>
+                </li>
+              ))
+            )}
+          </ul>
+
+          <div className="total-price">
+            <h3>Total</h3>
+            <p>₹ {totalPrice.toLocaleString('en-IN')}</p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={handleShareBuild}
+              style={{ flex: 1, background: '#fff', color: '#6b4eff', border: '2px solid #6b4eff', padding: '15px', borderRadius: '30px', fontWeight: '600', cursor: 'pointer', marginTop: '20px', transition: '0.3s' }}
+            >
+              <i className="fa-solid fa-link" style={{ marginRight: '8px' }}></i> Share
+            </button>
+            <button className="checkout-btn" onClick={handleAddToCart} style={{ flex: 2 }}>
+              Add To Cart
+            </button>
+          </div>
+          
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
