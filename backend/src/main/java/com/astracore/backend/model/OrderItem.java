@@ -13,15 +13,12 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Link back to the parent Order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     @JsonIgnore
     private Order order;
 
-    // We store the product details as strings/numbers here instead of a direct
-    // relationship to the Product table. This ensures that if a product's price
-    // changes in the future, it doesn't alter past order receipts!
+  
     private String productId;
     private String productName;
     private String productSlug;
@@ -30,6 +27,6 @@ public class OrderItem {
     private java.math.BigDecimal price;
     private Integer quantity;
 
-    @Column(length = 2000) // Ensure enough space for the PC parts text
+    @Column(length = 2000) 
     private String buildDetails;
 }

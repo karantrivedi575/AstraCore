@@ -26,12 +26,12 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password; // Will be encrypted via BCrypt
+    private String password; 
 
-    private String role = "ROLE_USER";
+    private String role = "ROLE_USER"; 
 
-    @Column(nullable = false)
-    private boolean enabled = true; // Default to true until email verification is implemented
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean enabled = false;
 
     private LocalDateTime createdAt;
 

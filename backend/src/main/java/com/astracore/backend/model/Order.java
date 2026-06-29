@@ -16,13 +16,12 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Link this order to a specific user
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
-    // Shipping Details (Matches your React Checkout form)
+    // Shipping Details
     private String firstName;
     private String lastName;
     private String email;
@@ -32,17 +31,14 @@ public class Order {
     private String pinCode;
     private String phone;
 
-    // Financials
     private java.math.BigDecimal subtotal;
     private java.math.BigDecimal tax;
     private java.math.BigDecimal totalAmount;
 
-    // Order Status
-    private String status = "PENDING"; // PENDING, PROCESSING, SHIPPED, DELIVERED
+    private String status = "PENDING"; 
 
     private LocalDateTime orderDate;
 
-    // Link to the items inside the order
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

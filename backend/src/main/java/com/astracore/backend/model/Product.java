@@ -37,7 +37,6 @@ public class Product {
     private String specs;
     private Integer wattage; // Power consumption in Watts
 
-    // --- NEW: Inventory Control ---
     @Column(name = "stock_status")
     private String stockStatus = "In Stock";
 
