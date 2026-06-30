@@ -21,9 +21,7 @@ public class ProductDto {
     private BigDecimal price;
 
     private String image;
-
     private String stockStatus;
-
     private Boolean isTrending;
 
     @NotNull(message = "Category ID is required")
