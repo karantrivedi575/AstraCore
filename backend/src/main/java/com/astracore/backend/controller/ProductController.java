@@ -22,20 +22,17 @@ public class ProductController {
 
     private final ProductRepository productRepository;
 
-   
     public ProductController(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
-    
-   
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllProducts(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "8") @Min(1) @Max(1000) int size) {
 
         Pageable paging = PageRequest.of(page, size);
-        Page<Product> pageProducts = productRepository.findAll(paging);
+        Page<Product> pageProducts = productRepository.findByIsActiveTrue(paging);
 
         Map<String, Object> response = new HashMap<>();
         response.put("products", pageProducts.getContent()); 
@@ -46,23 +43,20 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    
     @GetMapping("/trending")
     public ResponseEntity<List<Product>> getTrendingProducts() {
         return ResponseEntity.ok(productRepository.findByIsTrendingTrue());
     }
 
-    
     @GetMapping("/category/{slug}")
     public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable String slug) {
         List<Product> products = productRepository.findByCategorySlugIgnoreCase(slug);
         return ResponseEntity.ok(products);
     }
 
-  
     @GetMapping("/details/{slug}")
     public ResponseEntity<?> getProductBySlug(@PathVariable String slug) {
-        return productRepository.findBySlugIgnoreCase(slug)
+        return productRepository.findBySlugIgnoreCaseAndIsActiveTrue(slug)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
